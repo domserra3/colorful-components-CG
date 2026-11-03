@@ -1,8 +1,8 @@
 ## Description
-This repository contains the datasets and detailed results of the computational experiments presented in the research paper _"A unified edge contraction-based carousel greedy algorithm for colorful components problems"_ by D. Serra, C. Sorgente, C. Archetti, F. Carrabs, R. Cerulli.
+This repository contains the source code, datasets and detailed results of the computational experiments presented in the research paper _"A unified edge contraction-based carousel greedy algorithm for colorful components problems"_ by D. Serra, C. Sorgente, C. Archetti, F. Carrabs, R. Cerulli.
 
 Colorful components problems deal with partitioning a graph into connected colorful components, that is, connected components whose nodes have different colors.
-We provide a unified Carousel Greedy algorithm to tackle such a partitioning problem with three different objectives: minimize the number of edges between the components, minimize the number of components, and maximize the number of edges in the transitive closure of the resulting graph.
+We provide a unified Carousel Greedy framework for three colorful components problems with different objectives: minimize the number of edges between the components, minimize the number of components, and maximize the number of edges in the transitive closure of the resulting graph.
 
 ## Test instances
 The [data](https://github.com/domserra3/colorful-components-CG/tree/main/data) folder contains three sets of instances:
@@ -11,7 +11,51 @@ The [data](https://github.com/domserra3/colorful-components-CG/tree/main/data) f
 * The DIMACS set is an adaptation of the DIMACS benchmark instances used in the literature to address the graph coloring problem [[3]](#DIMACS2024).
 
 ## Computational results
-The [results](https://github.com/domserra3/colorful-components-CG/tree/main/results) folder contains a .xlsx file with detailed results of the computational experiments. An aggregation of these results are reported in Section 7 of the paper.
+The [results](https://github.com/domserra3/colorful-components-CG/tree/main/results) folder contains three .xlsx files with detailed computational results for each instance. Aggregated results are presented in Section 7 of the paper.
+
+## Source code
+The [code](https://github.com/domserra3/colorful-components-CG/tree/main/code) folder contains the Python implementation of the Edge Contraction Heuristic (ECH) and the Carousel Greedy algorithm (CG-CC), together with the three edge selection criteria, presented in the paper:
+* `wCC` (ColorCompatibility), designed for MCC
+* `wCS` (ColorAndSize), designed for MEC
+* `wEC` (EdgeConsolidation), designed for MOP
+
+### Installing dependencies
+Python 3.10 is required, together with the `numpy` and `networkx` packages.
+
+### Running the experiments
+The `run_experiments.py`script allows to run the algorithms on one or more instances as follows:
+```
+python run_experiments.py --instances <BHK|RANDOM|DIMACS> --problem <MCC|MEC|MOP> \
+    --decontraction <SD|ESD> --alpha <alpha> --beta <beta> [options]
+```
+For each instance, the script runs ECH and CG-CC, using the selected edge selection criterion, CG-CC parameters, and decontraction operator.
+
+The main parameters are:
+
+| Parameter | Description |
+|---|---|
+| `--instances` | Set of instances (`BHK`, `RANDOM` or `DIMACS`). |
+| `--problem` | Problem to solve (`MCC`, `MEC` or `MOP`). |
+| `--decontraction` | Decontraction operator (`SD` or `ESD`). |
+| `--weight` | Edge selection criterion (`wCC`, `wCS` or `wEC`). Default: `wCC` for MCC, `wCS` for MEC, `wEC` for MOP. |
+| `--alpha` | Parameter α of CG-CC (integer). |
+| `--beta` | Parameter β of CG-CC, as a percentage (e.g., `30` for β = 0.3). |
+| `--lambda` | Parameter λ required when using `wEC` (default `1.0`). Ignored by `wCC` and `wCS`. |
+| `--time_limit` | Time limit in seconds for each instance (default: `3600`). |
+| `--instance` | If specified, only the indicated instance(s) of the set will be run (e.g. `--instance BB11001C1.graph`). |
+| `--output` | Output folder (default `results`). |
+
+For example, the following commands run the algorithms on the BHK instances using the tuned parameter configurations for MCC, MEC, and MOP reported in the paper:
+```
+python run_experiments.py --instances BHK --problem MCC --weight wCC --decontraction ESD --alpha 25 --beta 40
+python run_experiments.py --instances BHK --problem MEC --weight wCS --decontraction ESD --alpha 20 --beta 40
+python run_experiments.py --instances BHK --problem MOP --weight wEC --decontraction ESD --alpha 25 --beta 30 --lambda 0.2321
+```
+
+
+For a complete list of available options and their default values, run `python run_experiments.py --help`.
+
+The results are saved in a CSV file in the specified output directory, with one row per instance reporting solution values for all three objectives and computational times.
 
 ## References
 <a id="Bruckner2012">[1]</a> 
